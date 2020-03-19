@@ -1,0 +1,128 @@
+
+
+<!doctype>
+<html>
+	<head>
+		<style>
+		body{
+			margin:0;
+			background: #eee;
+		}
+		#canvas{
+			width:640px;
+			height:360px;
+			background: #fff;
+		}
+		</style>
+	</head>
+	<body>
+		<canvas id="canvas" width="640" height="360"></canvas>
+	</body>
+</html>
+<script>
+
+// Code adapted from https://github.com/ncase/sight-and-light
+
+// -----------------------------------------------------------
+// https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
+function sqr(x) { return x * x }
+function dist2(v, w) { return sqr(v.x - w.x) + sqr(v.y - w.y) }
+function distToSegmentSquared(p, v, w) {
+  var l2 = dist2(v, w);
+  if (l2 == 0) return dist2(p, v);
+  var t = ((p.x - v.x) * (w.x - v.x) + (p.y - v.y) * (w.y - v.y)) / l2;
+  t = Math.max(0, Math.min(1, t));
+  return dist2(p, { x: v.x + t * (w.x - v.x),
+                    y: v.y + t * (w.y - v.y) });
+}
+function distToSegment(p, v, w) { return Math.sqrt(distToSegmentSquared(p, v, w)); }
+// -----------------------------------------------------------
+
+// DRAWING
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+
+function draw(){
+	points[0] = {x:Mouse.x, y:Mouse.y};
+
+	// Clear canvas
+	ctx.clearRect(0,0,canvas.width,canvas.height);
+	
+	drawRhombus();
+
+	ctx.lineWidth = 2;
+	ctx.beginPath();
+	ctx.arc(points[0].x, points[0].y, 1, 0, 2 * Math.PI);
+	ctx.stroke();
+	
+	var minDist = distToSegment(points[0], rhombus[0].a, rhombus[0].b);
+	
+	for (var i = 1; i < rhombus.length; i++) {
+		var dist = distToSegment(points[0], rhombus[i].a, rhombus[i].b);
+		if (dist < minDist) {
+			minDist = dist;
+		}
+	}
+	
+	ctx.lineWidth = 1;
+	ctx.beginPath();
+	ctx.arc(points[0].x, points[0].y, minDist, 0, 2 * Math.PI);
+	ctx.stroke();
+
+}
+
+// Draw rhombus
+function drawRhombus() {
+	ctx.lineWidth = 2;
+
+	ctx.strokeStyle = "#000";
+	for(var i=0;i<rhombus.length;i++){
+		var seg = rhombus[i];
+		ctx.beginPath();
+		ctx.moveTo(seg.a.x,seg.a.y);
+		ctx.lineTo(seg.b.x,seg.b.y);
+		ctx.stroke();
+	}
+	
+}
+
+// Rhombus shape lines
+var rhombus = [
+	// Border
+	{a:{x:320,y:300}, b:{x:220,y:180}},
+	{a:{x:220,y:180}, b:{x:320,y:60}},
+	{a:{x:320,y:60}, b:{x:420,y:180}},
+	{a:{x:420,y:180}, b:{x:320,y:300}},
+
+];
+
+var points = [
+];
+
+// DRAW LOOP
+window.requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.msRequestAnimationFrame;
+var updateCanvas = true;
+function drawLoop(){
+    requestAnimationFrame(drawLoop);
+    if(updateCanvas){
+    	draw();
+    	updateCanvas = false;
+    }
+}
+
+window.onload = function(){
+	drawLoop();
+};
+
+// MOUSE	
+var Mouse = {
+	x: canvas.width/2,
+	y: canvas.height/2
+};
+canvas.onmousemove = function(event){	
+	Mouse.x = event.clientX;
+	Mouse.y = event.clientY;
+	updateCanvas = true;
+};
+
+</script>

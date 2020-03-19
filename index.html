@@ -1,0 +1,78 @@
+<!doctype>
+<html>
+	<head>
+		<title>Distane Field Generation Demo</title>
+
+		<meta property="og:title" content="Distane Field Generation Demo">
+		
+		<style>
+		body{
+			margin:0;
+			background: #eee;
+			font-family: sans-serif;
+			font-size: 20px;
+			font-weight: 100;
+		}
+		iframe{
+			border: none;
+			display: block;
+			margin: 20px auto 50px auto;
+		}
+		#content{
+			width:840px;
+			margin:40px auto 100px auto;
+		}
+		#footer{
+			background: #000;
+			padding: 70px 0 100px 0;
+		}
+		#embedded{
+			border:0;
+			display:block;
+			margin:20px auto;
+		}
+		.code{
+			font-family:monospace;
+			color:#fff; font-weight:100; background:#333; border-radius:5px; padding:0 10px;
+		}
+		a{
+			color:#cc2727;
+		}
+		a:hover{
+			color:#ee3939;
+		}
+		</style>
+	</head>
+	<body>
+		Distance Field Generation Demo
+		
+		Suppose we have a vector shape such as
+		here I am using a simple rhombus for simplicity. The rhombus has four line segments
+		<iframe src="draft0.html" width="800" height="400"></iframe>
+		
+		So in order to generate distance field we calculate the distance of a point to the nearest edage of the shape.
+		<iframe src="draft1.html" width="800" height="400"></iframe>
+		
+		And we do this for each pixel in the image and the radius of the circle is used as the distance field value for each pixel.
+		<iframe src="draft2.html" width="800" height="400"></iframe>
+		<br>
+		
+		Here is the actual distance field generated using msdfgen
+		<br>
+		
+		<img src="original.png" width="300" height="400"></img>
+		<img src="generated.png" width="300" height="400"></img>
+		<br>
+		<br>
+		Original on left. Generated on right
+		<br>
+		<br>
+		The only problem with this method is that they produce round corners while rendering. Here is an image showing this issue.
+		<br>
+		<img src="problem.png" width="400" height="400"></img>
+		<a href="https://github.com/Chlumsky/msdfgen">source</a>
+		<br>
+		So in order to solve this Chlumsky suggested to use multiple color channel and divide the shape into multiple shapes.
+		He has a detailed description on how this works in his <a href="https://github.com/Chlumsky/msdfgen/files/3050967/thesis.pdf">paper</a> which can also be found on his github <a href="https://github.com/Chlumsky/msdfgen">page</a>.
+	</body>
+</html>
